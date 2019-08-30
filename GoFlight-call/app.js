@@ -4,7 +4,7 @@ const session = require('express-session');
 const morgan = require('morgan');
 const path = require('path');
 
-const app = express.Router();
+const app = express();
 require('dotenv').config();
 
 const indexRouter = require('./routes');
