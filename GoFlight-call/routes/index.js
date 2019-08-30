@@ -9,7 +9,7 @@ const URL = 'http://localhost:8002/v1';
 
 const request = async (req, api) => {
     try {
-        console.log("토큰 세션:", req.session.jwt);
+        console.log("토큰 세션 확인:", req.session.jwt);
         if (!req.session.jwt) { // 세션에 토큰이 없으면
             const tokenResult = await axios.post(`${URL}/token`, {
                 clientSecret: process.env.CLIENT_SECRET,
@@ -20,26 +20,26 @@ const request = async (req, api) => {
                 console.log(tokenResult.data.token);
             }
             else { // 토큰 발급 실패
-                return res.json(tokenResult.data.message); // 발급 실패 사유 응답
+                return tokenResult.data; // 발급 실패 사유 응답
             }
         }
         // 발급받은 토큰 API 요청
-        const result = await axios.get(`${URL}${api}`, {
+        return await axios.get(`${URL}${api}`, {
             headers: { authorization: req.session.jwt },
         });
-        return res.json(result.data);
     } catch (error) {
         if (error.response.status === 419) { // 토큰 만료 시 토큰 재발급
+            console.log('토큰 만료');
             delete req.session.jwt;
             return request(req, api);
         } // 419 외의 다른 에러면
-        return next(error);
+        return error.response;
     }
 };
 
 router.get('/mypost', async (req, res, next)=>{
     try {
-        const result = await request(req, '/post/my');
+        const result = await request(req, '/posts/my');
         res.json(result.data);
     } catch (error) {
         console.error(error);
