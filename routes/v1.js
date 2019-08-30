@@ -1,8 +1,8 @@
-const express = require('express');
-const jwt = require('jsonwebtoken');
+const express=require('express');
+const jwt=require('jsonwebtoken');
 
-const { verifyToken } =require('./middlewares');
-const { Domain, User, Post, Hashtag} = require('../models');
+const { verifyToken }=require('./middlewares');
+const { Domain, User, }=require('../models');
 
 const router = express.Router();
 
@@ -15,9 +15,9 @@ router.post('/token', async (req, res, next)=>{
     */
     try {
         const domain = await Domain.findOne({
-            where: { clientSecret},
+            where: { clientSecret },
             include: [{
-                models: User,
+                model: User,
                 attribute: ['nick', 'id'],
             }]
         });
@@ -27,7 +27,7 @@ router.post('/token', async (req, res, next)=>{
                 message: "등록되지 않은 도메인입니다. 먼저 도메인을 등록하세요."
             })
         }
-        const token = jwt.sign({
+        const token = await jwt.sign({
             id: domain.user.id,
             nick: domain.user.nick,
         }, process.env.JWT_SECRET, {
@@ -39,12 +39,19 @@ router.post('/token', async (req, res, next)=>{
         return res.json({
             code: 200,
             message: '토큰이 발급되었습니다.',
-            token
+            token,
         });
     } catch (error) {
+        console.error(error);
         return res.status(500).json({
             code: 500,
-            message: '서버 에러'
+            message: error.message
         });
-    }
-})
+1    }
+});
+
+router.get('/test', verifyToken, (req , res) => {
+    res.json(req.decoded);
+});
+
+module.exports = router;
