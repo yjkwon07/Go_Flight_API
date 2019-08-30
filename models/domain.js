@@ -18,10 +18,11 @@ module.exports = (sequelize, DataTypes) => {
             paranoid: true,
             validate: {
                 unknownType() {
-                    if(this.type !== 'free' && this.type !== 'premium') {
-                        throw new Error('type 컬럼은 free거나 premium이어야 합니다.');
+                    console.log(this.type, this.type !== 'free', this.type !== 'premium');
+                    if (this.type !== 'free' && this.type !== 'premium') {
+                      throw new Error('type 컬럼은 free나 premium이어야 합니다.');
                     }
-                }
+                  },
             }
         });
 };
