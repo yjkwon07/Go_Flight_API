@@ -1,7 +1,7 @@
 const express = require('express');
-const uuidv4 = require('uuid/v4');
+const uuidv4 = require('uuid/v4'); // v1 혹은 v4를 많이 사용한다.
 const router = express.Router();
-const { User , Post, Domain } = require('../models');
+const { User, Domain } = require('../models');
 
 router.get('/', (req, res, next) => {
     User.findOne({
@@ -11,6 +11,7 @@ router.get('/', (req, res, next) => {
         .then((user) => {
             res.render('login', {
                 user, 
+                title:'main - GoFlight',
                 loginError: req.flash('loginError'),
                 domains: user && user.domains,
             })
