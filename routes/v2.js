@@ -1,11 +1,10 @@
 const express = require('express');
-const { verifyToken, deprecated } = require('./middlewares');
+const { verifyToken, apiLimiter } = require('./middlewares');
 const { Post, Hashtag, User } = require('../models');
 
 const router = express.Router();
-router.use(deprecated);
 router.use(verifyToken);
-
+router.use(apiLimiter);
 router.get('/posts/id', async (req, res) => {
     Post.findAll({ where: { userId: req.decoded.id } })
         .then((posts) => {

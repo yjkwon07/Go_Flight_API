@@ -1,9 +1,10 @@
 const express = require('express');
-const {verifyToken} = require('./middlewares')
+const {verifyToken, apiLimiter} = require('./middlewares')
 const { Domain, User } = require('../models');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
 
+router.use(apiLimiter);
 router.post('/create', async (req, res) => {
     const { clientSecret } = req.body;
     try {

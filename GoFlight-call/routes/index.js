@@ -4,7 +4,7 @@ const axios = require('axios');
 const router = express.Router();
 const URL = 'http://localhost:8002';
 const TOKEN_URL= '/v1-token/create'
-const VERSION = '/v1-Go_Flight_API';
+const VERSION = '/v2-Go_Flight_API';
 
 const request = async (req, api) => {
     try {

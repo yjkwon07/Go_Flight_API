@@ -12,6 +12,7 @@ const { sequelize } = require('./models');
 const autRouter = require('./routes/auth');
 const indexRouter = require('./routes');
 const v1 = require('./routes/v1');
+const v2 = require('./routes/v2');
 
 const tokenRouter = require('./routes/v1-token');
 
@@ -48,6 +49,7 @@ app.use('/auth', autRouter);
 app.use('/', indexRouter);
 app.use('/v1-token', tokenRouter);
 app.use('/v1-Go_Flight_API', v1);
+app.use('/v2-Go_Flight_API', v2);
 
 
 app.use((_req, _res, next)=> {
