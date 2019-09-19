@@ -2,12 +2,14 @@ const express = require('express');
 const axios = require('axios');
 
 const router = express.Router();
-const URL = 'http://localhost:8002/v1';
+const URL = 'http://localhost:8002';
+const TOKEN_URL= '/v1-token/create'
+const VERSION = '/v1-Go_Flight_API';
 
 const request = async (req, api) => {
     try {
         if (!req.session.jwt) { 
-            const tokenResult = await axios.post(`${URL}/token`, {
+            const tokenResult = await axios.post(`${URL}${TOKEN_URL}`, {
                 clientSecret: process.env.CLIENT_SECRET,
             });
             if (tokenResult.data && tokenResult.data.code === 200) { 
@@ -33,7 +35,7 @@ const request = async (req, api) => {
 
 router.get('/posts/id', async (req, res, next)=>{
     try {
-        const result = await request(req, '/Go_Flight_API/posts/id');
+        const result = await request(req, `${VERSION}/posts/id`);
         res.json(result.data);
     } catch (error) {
         console.error(error);
@@ -43,7 +45,7 @@ router.get('/posts/id', async (req, res, next)=>{
 
 router.get('/posts/all', async (req, res, next) => {
     try {
-        const result = await request(req, '/Go_Flight_API/posts/all');
+        const result = await request(req, `${VERSION}/posts/all`);
         res.json(result.data);
     } catch (error) {
         console.error(error);
@@ -51,10 +53,10 @@ router.get('/posts/all', async (req, res, next) => {
     }
 });
 
-router.get('/posts/:count', async (req, res, next) => {
+router.get('/posts/page/:count', async (req, res, next) => {
     try {
         const count = req.params.count;
-        const result = await request(req, `/Go_Flight_API/posts/${count}`);
+        const result = await request(req, `${VERSION}/posts/page/${count}`);
         return res.json(result.data);
     } catch (error) {
         console.error(error);
@@ -62,10 +64,10 @@ router.get('/posts/:count', async (req, res, next) => {
     }
 });
 
-router.get('/search/:hashtag', async (req, res, next) => {
+router.get('/hashtag/all', async (req, res, next) => {
     try {
         const result = await request(
-            req, `/posts/hashtag/${encodeURIComponent(req.params.hashtag)}`,
+            req, `${VERSION}/hashtag/all`,
         );
         res.json(result.data);
     } catch (error) {
@@ -74,6 +76,35 @@ router.get('/search/:hashtag', async (req, res, next) => {
             next(error);
         }
     }
-})
+});
+
+router.get('/hashtag/search/:hashtag', async (req, res, next) => {
+    try {
+        const result = await request(
+            req, `${VERSION}/hashtag/search/${encodeURIComponent(req.params.hashtag)}`,
+        );
+        res.json(result.data);
+    } catch (error) {
+        if(error.code) {
+            console.error(error);
+            next(error);
+        }
+    }
+});
+
+router.get('/hashtag/page/:count', async (req, res, next) => {
+    try {
+        const count = req.params.count;
+        const result = await request(
+            req, `${VERSION}/hashtag/page/${count}`,
+        );
+        res.json(result.data);
+    } catch (error) {
+        if(error.code) {
+            console.error(error);
+            next(error);
+        }
+    }
+});
 
 module.exports = router;
