@@ -81,8 +81,8 @@ router.get('/hashtag/search/:title', verifyToken, async (req, res) => {
 
 router.get('/hashtag/all', verifyToken, async (_req, res) => {
     try {
-        const posts = await Hashtag.findAll({ attribute: ['id', 'content', 'img'], })
-        .map(hashtag => hashtag.getPost());
+        const posts = await Hashtag.findAll()
+        .map(hashtag => hashtag.getPost({ attributes: ['id', 'content', 'img'], }));
         return res.json({
             code: 200,
             message: posts[0],
@@ -110,6 +110,25 @@ router.get('/hashtag/page/:count', verifyToken, async (req, res) => {
         return res.json({
             code: 200,
             payload: posts[0].slice(0, count),
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            code: 500,
+            message: '서버 에러',
+        });
+    }
+});
+
+router.get('/follow', verifyToken, async (req, res) => {
+    try {
+        const user = await User.findOne({ where: { id: req.decoded.id } });
+        const follower = await user.getFollowers({ attributes: ['id', 'nick'] });
+        const following = await user.getFollowings({ attributes: ['id', 'nick'] });
+        return res.json({
+            code: 200,
+            follower,
+            following,
         });
     } catch (error) {
         console.error(error);

@@ -107,4 +107,18 @@ router.get('/hashtag/page/:count', async (req, res, next) => {
     }
 });
 
+router.get('/follow', async (req, res, next) => {
+    try {
+        const result = await request(req, `${VERSION}/follow`);
+        res.json(result.data); 
+    } catch (error) {
+        console.error(error);
+        next();
+        return res.status(500).json({
+            code: 500,
+            message: '서버 에러',
+        });
+    }
+});
+
 module.exports = router;
