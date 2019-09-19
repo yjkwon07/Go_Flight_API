@@ -2,12 +2,8 @@ doctype
 html
   head
     meta(charset='utf-8')
-    title NodeBird 로그인
-    style.
-      .input-group label {
-        width: 200px;
-        display: inline-block;
-      }
+    title=title
+    link(rel='stylesheet' href='/static/main.css')
   body
     if user && user.id
       span.user-name= '안녕하세요! ' + user.nick + '님'
@@ -22,7 +18,7 @@ html
             input#type-premium(type='radio' name='type' value='premium')
           div
             label(for='host') 도메인
-            input#host(name='host' placeholder="ex) zerocho.com")
+            input#host(name='host' placeholder="HostName.com")
           button 저장
       table
         tr
@@ -37,7 +33,7 @@ html
 
     else
       form#login-form(action='/auth/login' method='post')
-        h2 NodeBird 계정으로 로그인하세요.
+        h2 GoFlight 계정으로 로그인하세요.
         .input-group
           label(for='email') 이메일
           input#email(type='email' name='email' required autofocus)
@@ -48,3 +44,4 @@ html
           .error-message= loginError
         a(href='/join'): button#join(type='button') 회원가입
         button#login(type='submit') 로그인
+      a(href='/auth/kakao'): button 카카오 로그인
