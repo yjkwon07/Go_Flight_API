@@ -13,6 +13,9 @@ const autRouter = require('./routes/auth');
 const indexRouter = require('./routes');
 const v1 = require('./routes/v1');
 
+const tokenRouter = require('./routes/v1-token');
+
+
 require('dotenv').config();
 passportConfig(passport);
 sequelize.sync(); 
@@ -41,9 +44,11 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/v1', v1);
 app.use('/auth', autRouter);
 app.use('/', indexRouter);
+app.use('/v1-token', tokenRouter);
+app.use('/v1-Go_Flight_API', v1);
+
 
 app.use((_req, _res, next)=> {
     const err=new Error("NotFound");
