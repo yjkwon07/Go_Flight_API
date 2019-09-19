@@ -21,7 +21,7 @@ db.Hashtag.belongsToMany(db.Post, { through: 'PostHashtag', as: 'Post', foreignK
 db.User.belongsToMany(db.User, { through: 'Follow', as: 'Followers', foreignKey: 'followingId' });
 db.User.belongsToMany(db.User, { through: 'Follow', as: 'Followings', foreignKey: 'followerId' });
 
-db.User.belongsToMany(db.Post, { through: 'Like', as: 'Post', foreignKey: 'userId' });
+db.User.belongsToMany(db.Post, { through: 'Like', as: 'LikePost', foreignKey: 'userId' });
 db.Post.belongsToMany(db.User, { through: 'Like', as: "Liker", foreignKey: 'postId' });
 
 db.User.hasMany(db.Domain);
