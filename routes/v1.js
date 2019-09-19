@@ -8,18 +8,14 @@ const router = express.Router();
 
 router.post('/token', async (req, res) => {
     const { clientSecret } = req.body;
-    /*
-        API 서버의 응답 형식은 하나로 통일해주는 게 좋다. 
-        (JSON 등) 또한 에러 코드를 고유하게 지정해 에러가 뭔지 
-        쉽게 알 수 있게 한다. 
-    */
     try {
         const domain = await Domain.findOne({
             where: { clientSecret },
             include: [{
                 model: User,
                 attribute: ['nick', 'id'],
-            }]
+                as: 'User'
+            }],
         });
         if (!domain) {
             return res.status(401).json({
@@ -28,14 +24,12 @@ router.post('/token', async (req, res) => {
             })
         }
         const token = await jwt.sign({
-            id: domain.user.id,
-            nick: domain.user.nick,
+            id: domain.User.id,
+            nick: domain.User.nick,
         }, process.env.JWT_SECRET, {
-                // 유효 시간
-                expiresIn: '1m',
-                // 발급자 
-                issuer: 'GoFlight',
-            });
+            expiresIn: '1m',
+            issuer: 'GoFlight',
+        });
         return res.json({
             code: 200,
             message: '토큰이 발급되었습니다.',
@@ -47,7 +41,6 @@ router.post('/token', async (req, res) => {
             code: 500,
             message: error.message
         });
-        
     }
 });
 
@@ -55,13 +48,48 @@ router.get('/test', verifyToken, (req, res) => {
     res.json(req.decoded);
 });
 
-router.get('/posts/my', verifyToken, (req, res) => {
+router.get('/Go_Flight_API/posts/id', verifyToken, (req, res) => {
     Post.findAll({ where: { userId: req.decoded.id } })
         .then((posts) => {
-            console.log(posts);
             res.json({
                 code: 200,
                 payload: posts,
+            });
+        })
+        .catch((error) => {
+            console.error(error);
+            return res.status(500).json({
+                code: 500,
+                message: '서버 에러',
+            });
+        });
+});
+
+router.get('/Go_Flight_API/posts/all', verifyToken, (req, res) => {
+    Post.findAll()
+        .then((posts) => {
+            res.json({
+                code: 200,
+                payload: posts,
+            });
+        })
+        .catch((error) => {
+            console.error(error);
+            return res.status(500).json({
+                code: 500,
+                message: '서버 에러',
+            });
+        });
+});
+
+router.get('/Go_Flight_API/posts/:count', verifyToken, (req, res) => {
+    const count = req.params.count;
+    Post.findAll()
+        .then((posts) => {
+            console.log(posts.slice(0, count))
+            res.json({
+                code: 200,
+                payload: posts.slice(0, count),
             });
         })
         .catch((error) => {
@@ -82,7 +110,7 @@ router.get('/posts/hashtag/:title', verifyToken, async(req, res)=>{
                 message: '검색 결과가 없습니다.',
             });
         }
-        const posts = await hashtag.getPosts();
+        const posts = await hashtag.getPost();
         return res.json({
             code: 200,
             payload: posts,
