@@ -2,8 +2,21 @@ const express = require('express');
 const {verifyToken, apiLimiter} = require('./middlewares')
 const { Domain, User } = require('../models');
 const jwt = require('jsonwebtoken');
+const cors = require('cors');
+const url = require('url');
 const router = express.Router();
 
+// router.use(cors());
+router.use(async (req, res, next) => {
+    const domain = await Domain.findOne({
+        where: { host: url.parse(req.get('origin')).host },
+    });
+    if (domain) {
+        cors({ origin: req.get('origin') })(req, res, next);
+    } else {
+        next();
+    }
+});
 router.use(apiLimiter);
 router.post('/create', async (req, res) => {
     const { clientSecret } = req.body;

@@ -1,8 +1,24 @@
 const express = require('express');
-const { verifyToken, apiLimiter } = require('./middlewares');
-const { Post, Hashtag, User } = require('../models');
+const cors = require('cors');
+const url = require('url');
 
+const { verifyToken, apiLimiter } = require('./middlewares');
+const { Post, Hashtag, User, Domain} = require('../models');
 const router = express.Router();
+
+// router.use(cors());
+router.use(async (req, res, next) => {
+    const domain = await Domain.findOne({
+        where: { host: url.parse(req.get('origin')).host },
+    });
+    console.log(domain)
+    if (domain) {
+        cors({ origin: req.get('origin') })(req, res, next);
+    } else {
+        next();
+    }
+});
+
 router.use(verifyToken);
 router.use(apiLimiter);
 router.get('/posts/id', async (req, res) => {
