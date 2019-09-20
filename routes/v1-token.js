@@ -1,5 +1,5 @@
 const express = require('express');
-const {verifyToken, apiLimiter} = require('./middlewares')
+const {verifyToken, apiLimiter, premiumApiLimiter} = require('./middlewares')
 const { Domain, User } = require('../models');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
@@ -17,7 +17,18 @@ router.use(async (req, res, next) => {
         next();
     }
 });
-router.use(apiLimiter);
+
+router.use( async (req, res, next) => {
+    const domain = await Domain.findOne({
+        where: { host : url.parse(req.get('origin')).host }
+    });
+    if(domain.type === 'free'){
+        apiLimiter(req, res, next);
+    } else {
+        premiumApiLimiter(req, res, next);
+    }
+});
+
 router.post('/create', async (req, res) => {
     const { clientSecret } = req.body;
     try {

@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const url = require('url');
 
-const { verifyToken, apiLimiter } = require('./middlewares');
+const { verifyToken, apiLimiter, premiumApiLimiter } = require('./middlewares');
 const { Post, Hashtag, User, Domain} = require('../models');
 const router = express.Router();
 
@@ -11,7 +11,6 @@ router.use(async (req, res, next) => {
     const domain = await Domain.findOne({
         where: { host: url.parse(req.get('origin')).host },
     });
-    console.log(domain)
     if (domain) {
         cors({ origin: req.get('origin') })(req, res, next);
     } else {
@@ -19,8 +18,19 @@ router.use(async (req, res, next) => {
     }
 });
 
+router.use( async (req, res, next) => {
+    const domain = await Domain.findOne({
+        where: { host : url.parse(req.get('origin')).host }
+    });
+    if(domain.type === 'free'){
+        apiLimiter(req, res, next);
+    } else {
+        premiumApiLimiter(req, res, next);
+    }
+});
+
 router.use(verifyToken);
-router.use(apiLimiter);
+
 router.get('/posts/id', async (req, res) => {
     Post.findAll({ where: { userId: req.decoded.id } })
         .then((posts) => {
