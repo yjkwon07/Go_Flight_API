@@ -13,7 +13,7 @@ db.Hashtag = require('./hashtag')(sequelize, Sequelize);
 db.Domain = require('./domain')(sequelize, Sequelize);
 
 db.User.hasMany(db.Post);
-db.Post.belongsTo(db.User, { through: 'Post', as: 'User', foreignKey: 'userId' });
+db.Post.belongsTo(db.User, { through: 'Posts', as: 'User', foreignKey: 'userId' });
 
 db.Post.belongsToMany(db.Hashtag, { through: 'PostHashtag', as: 'Hashtag', foreignKey: 'postId' });
 db.Hashtag.belongsToMany(db.Post, { through: 'PostHashtag', as: 'Post', foreignKey: 'hashtagId' });
@@ -25,6 +25,6 @@ db.User.belongsToMany(db.Post, { through: 'Like', as: 'LikePost', foreignKey: 'u
 db.Post.belongsToMany(db.User, { through: 'Like', as: "Liker", foreignKey: 'postId' });
 
 db.User.hasMany(db.Domain);
-db.Domain.belongsTo(db.User, { through: 'User', as: 'User', foreignKey: 'userId' });
+db.Domain.belongsTo(db.User, { through: 'Domains', as: 'User', foreignKey: 'userId' });
 
 module.exports = db;
