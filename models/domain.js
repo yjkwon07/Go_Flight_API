@@ -8,7 +8,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING(10),
             allowNull: false, 
         },
-        clientSecret: {
+        serverSecret: {
+            type: DataTypes.STRING(40),
+            allowNull: false,
+        },
+        frontSecret: {
             type: DataTypes.STRING(40),
             allowNull: false,
         },
