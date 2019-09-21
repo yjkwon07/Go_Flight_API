@@ -3,14 +3,15 @@ const axios = require('axios');
 
 const router = express.Router();
 const URL = 'http://localhost:8002';
-const TOKEN_URL= '/v1-token/create'
+const TOKEN_URL= '/create'
 const VERSION = '/v2-Go_Flight_API';
 
+axios.defaults.headers.origin = 'http://localhost:8003'; // origin 헤더 추가
 const request = async (req, api) => {
     try {
         if (!req.session.jwt) { 
-            const tokenResult = await axios.post(`${URL}${TOKEN_URL}`, {
-                clientSecret: process.env.CLIENT_SECRET,
+            const tokenResult = await axios.post(`${URL}${VERSION}${TOKEN_URL}`, {
+                serverSecret: process.env.SERVER_SECRET,
             });
             if (tokenResult.data && tokenResult.data.code === 200) { 
                 req.session.jwt = tokenResult.data.token; 
@@ -122,7 +123,7 @@ router.get('/follow', async (req, res, next) => {
 });
 
 router.get('/', (req, res) => {
-    res.render('main', { key: process.env.CLIENT_SECRET });
-  });
+    res.render('main', { key: process.env.FRONT_SECRET });
+});
 
 module.exports = router;
