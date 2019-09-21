@@ -2,10 +2,12 @@ const express = require('express');
 const cors = require('cors');
 const url = require('url');
 const jwt = require('jsonwebtoken');
+const sequelize = require("sequelize");
 
 const { verifyToken, apiLimiter, premiumApiLimiter } = require('./middlewares');
 const { Post, Hashtag, User, Domain} = require('../models');
 const router = express.Router();
+const Op = sequelize.Op;
 
 // router.use(cors());
 router.use(async (req, res, next) => {
@@ -34,7 +36,13 @@ router.post('/create', async (req, res) => {
     const { frontSecret , serverSecret } = req.body;
     try {
         const domain = await Domain.findOne({
-            where: { frontSecret: frontSecret || null, serverSecret: serverSecret || null },
+            where: {
+                [Op.or]: [{
+                    frontSecret: frontSecret || null
+                },{
+                    serverSecret: serverSecret || null
+                }]
+            },
             include: [{
                 model: User,
                 attribute: ['id', 'nick'],
@@ -42,6 +50,7 @@ router.post('/create', async (req, res) => {
             }],
         });
         if (!domain) {
+            console.log(domain)
             return res.status(401).json({
                 code: 401,
                 message: '등록되지 않은 도메인 입니다. 먼저 도메인을 등록하세요.',
